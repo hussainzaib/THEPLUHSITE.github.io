@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Pluh Site</title>
+    
+    <meta name="description" content="IDK WHY I MADE IT <:!.">
+    <meta name="theme-color" content="#d32f2f">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #131a26;
+            --text-main: #f8fafc;
+            
+            /* Button 1: Pluh (Red) */
+            --pluh-grad-top: #ff4d4d;
+            --pluh-grad-bot: #990000;
+            --pluh-shadow: #660000;
+            
+            /* Button 2: Rizzing (Purple) */
+            --rizz-grad-top: #a78bfa;
+            --rizz-grad-bot: #5b21b6;
+            --rizz-shadow: #4c1d95;
+
+            /* Button 3: AHHHHH! (Orange/Amber) */
+            --ah-grad-top: #fb923c;
+            --ah-grad-bot: #c2410c;
+            --ah-shadow: #7c2d12;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 40px 20px;
+            overflow: hidden; /* Keeps custom floating elements within limits */
+            position: relative;
+        }
+
+        /* --- FULL SCREEN BACKGROUND CHICKEN GIF --- */
+        .chicken-bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('https://imgs.search.brave.com/c8ypZXAVZ4lpd8P6qjrGW5fSrr17i7poN2vDk3YRRYI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YTEudGVub3IuY29t/L20venJGRW5kTk1O/RThBQUFBZC9jaGlj/a2VuLXNjcmVhbWlu/Zy10cmVlLmdpZg.gif');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 1;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        /* Active overlay fade state */
+        .chicken-bg-overlay.active {
+            opacity: 0.35; /* Adjusted so you can still read text and see your control dashboard clearly */
+            visibility: visible;
+        }
+
+        .soundboard-container {
+            background: var(--card-bg);
+            border-radius: 32px;
+            padding: 3rem;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            text-align: center;
+            max-width: 850px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 10; /* Ensures control elements sit safely on top of background */
+        }
+
+        h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            font-size: 3rem;
+            margin-bottom: 3.5rem;
+            letter-spacing: 1px;
+            background: linear-gradient(45deg, #ff4d4d, #fb923c, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sound-layout {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+        }
+
+        .sound-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 160px;
+        }
+
+        .sound-label {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 1.25rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* --- REALISTIC 3D ARCADE BUTTON SYSTEM --- */
+        .button-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
+        }
+
+        .button-rim {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #242f42;
+            border-radius: 50%;
+            box-shadow: 
+                0 8px 16px rgba(0,0,0,0.5),
+                inset 0 4px 6px rgba(255,255,255,0.1),
+                inset 0 -4px 6px rgba(0,0,0,0.4);
+        }
+
+        .button-base-glow {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .arcade-btn {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 128px;
+            height: 116px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.08s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .arcade-btn::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 20px;
+            width: 88px;
+            height: 32px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 100%);
+            border-radius: 50% / 100% 100% 0% 0%;
+        }
+
+        /* PLUH BUTTON SPECIFICS */
+        .pluh-glow { background: var(--pluh-shadow); }
+        .pluh-btn {
+            background: linear-gradient(180deg, var(--pluh-grad-top) 0%, var(--pluh-grad-bot) 100%);
+            box-shadow: 0 12px 0 var(--pluh-shadow), 0 15px 20px rgba(0,0,0,0.6), inset 0 6px 4px rgba(255,255,255,0.4), inset 0 -6px 8px rgba(0,0,0,0.3);
+        }
+        .sound-item:active .pluh-glow { box-shadow: 0 0 35px rgba(255, 61, 61, 0.6); }
+        .pluh-btn:active {
+            transform: translateY(10px);
+            box-shadow: 0 2px 0 var(--pluh-shadow), 0 4px 6px rgba(0,0,0,0.4), inset 0 4px 4px rgba(255,255,255,0.3), inset 0 -4px 6px rgba(0,0,0,0.4);
+        }
+
+        /* RIZZING BUTTON SPECIFICS */
+        .rizz-glow { background: var(--rizz-shadow); }
+        .rizz-btn {
+            background: linear-gradient(180deg, var(--rizz-grad-top) 0%, var(--rizz-grad-bot) 100%);
+            box-shadow: 0 12px 0 var(--rizz-shadow), 0 15px 20px rgba(0,0,0,0.6), inset 0 6px 4px rgba(255,255,255,0.4), inset 0 -6px 8px rgba(0,0,0,0.3);
+        }
+        .sound-item:active .rizz-glow { box-shadow: 0 0 35px rgba(139, 92, 246, 0.6); }
+        .rizz-btn:active {
+            transform: translateY(10px);
+            box-shadow: 0 2px 0 var(--rizz-shadow), 0 4px 6px rgba(0,0,0,0.4), inset 0 4px 4px rgba(255,255,255,0.3), inset 0 -4px 6px rgba(0,0,0,0.4);
+        }
+
+        /* AHHHHH! BUTTON SPECIFICS */
+        .ah-glow { background: var(--ah-shadow); }
+        .ah-btn {
+            background: linear-gradient(180deg, var(--ah-grad-top) 0%, var(--ah-grad-bot) 100%);
+            box-shadow: 0 12px 0 var(--ah-shadow), 0 15px 20px rgba(0,0,0,0.6), inset 0 6px 4px rgba(255,255,255,0.4), inset 0 -6px 8px rgba(0,0,0,0.3);
+        }
+        .sound-item:active .ah-glow { box-shadow: 0 0 35px rgba(251, 146, 60, 0.6); }
+        .ah-btn:active {
+            transform: translateY(10px);
+            box-shadow: 0 2px 0 var(--ah-shadow), 0 4px 6px rgba(0,0,0,0.4), inset 0 4px 4px rgba(255,255,255,0.3), inset 0 -4px 6px rgba(0,0,0,0.4);
+        }
+
+        /* --- VISUAL EASTER EGGS OVERLAYS --- */
+        .bouncing-gif {
+            position: fixed;
+            width: 150px;
+            height: auto;
+            z-index: 9999;
+            pointer-events: none;
+            display: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .rizz-tracker-gif {
+            position: fixed;
+            width: 260px;
+            height: auto;
+            z-index: 10000;
+            pointer-events: none;
+            display: none;
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4);
+            transform: translate(15px, 15px);
+            transition: transform 0.05s linear;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Full Screen Dynamic Chicken Background Layer -->
+    <div id="chickenBg" class="chicken-bg-overlay"></div>
+
+    <!-- DVD Seal Screensaver Element -->
+    <img src="https://imgs.search.brave.com/59oIZvBAIgHO0tgK0bHr2n5ePplidLaFc8OUpdFNEWY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS50ZW5vci5jb20v/T1dLNEQ5eEt6SVVB/QUFBTS9wbHVoLXNl/YWwtcGx1aC5naWY.gif" 
+         id="pluhSeal" class="bouncing-gif" alt="Bouncing Pluh Seal">
+
+    <!-- Mouse Tracking Rizz Cat Element -->
+    <img src="https://imgs.search.brave.com/Uii8IRl_rfMM18boOktmUk05bmFdxSAC9xaPCzz0HtE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YTEudGVub3IuY29t/L20vbjNqajBxbDlX/ZzhBQUFBZC9yaXp6/aW5nLXVwLWJhYmVz/LmdpZg.gif" 
+         id="rizzCat" class="rizz-tracker-gif" alt="Rizzing Up Babes Tracking GIF">
+
+    <main class="soundboard-container">
+        <h1>THE PLUH SITE</h1>
+        
+        <div class="sound-layout">
+            <!-- Button 1: PLUH -->
+            <div class="sound-item">
+                <div class="button-wrapper">
+                    <div class="button-rim"></div>
+                    <div class="button-base-glow pluh-glow"></div>
+                    <button class="arcade-btn pluh-btn" id="pluhButton" title="Play Pluh"></button>
+                </div>
+                <div class="sound-label" style="color: var(--pluh-grad-top);">Pluh</div>
+            </div>
+
+            <!-- Button 2: RIZZING -->
+            <div class="sound-item">
+                <div class="button-wrapper">
+                    <div class="button-rim"></div>
+                    <div class="button-base-glow rizz-glow"></div>
+                    <button class="arcade-btn rizz-btn" id="rizzButton" title="Play Rizzing"></button>
+                </div>
+                <div class="sound-label" style="color: var(--rizz-grad-top);">Rizzing</div>
+            </div>
+
+            <!-- Button 3: AHHHHH! -->
+            <div class="sound-item">
+                <div class="button-wrapper">
+                    <div class="button-rim"></div>
+                    <div class="button-base-glow ah-glow"></div>
+                    <button class="arcade-btn ah-btn" id="ahButton" title="Play AHHHHH!"></button>
+                </div>
+                <div class="sound-label" style="color: var(--ah-grad-top);">AHHHHH!</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Global Sound Assets -->
+    <audio id="audioPluh" src="https://www.myinstants.com/media/sounds/pluh.mp3" preload="auto"></audio>
+    <audio id="audioRizz" src="https://www.myinstants.com/media/sounds/rizz-sound-effect.mp3" preload="auto"></audio>
+    <audio id="audioAh" src="https://www.myinstants.com/media/sounds/chicken-on-tree-screaming.mp3" preload="auto"></audio>
+
+    <script>
+        const pluhBtn = document.getElementById('pluhButton');
+        const rizzBtn = document.getElementById('rizzButton');
+        const ahBtn = document.getElementById('ahButton');
+
+        const audioPluh = document.getElementById('audioPluh');
+        const audioRizz = document.getElementById('audioRizz');
+        const audioAh = document.getElementById('audioAh');
+
+        const seal = document.getElementById('pluhSeal');
+        const rizzCat = document.getElementById('rizzCat');
+        const chickenBg = document.getElementById('chickenBg');
+
+        // --- BUTTON 1: PLUH + DVD ANIMATION ENGINE ---
+        let posX = 0, posY = 0;
+        let speedX = 4, speedY = 4;
+        let animationFrameId = null;
+        let isBouncing = false;
+
+        pluhBtn.addEventListener('pointerdown', () => {
+            audioPluh.currentTime = 0;
+            audioPluh.play().catch(e => console.log(e));
+            triggerBouncingSeal();
+        });
+
+        function triggerBouncingSeal() {
+            const sealWidth = seal.offsetWidth || 150;
+            const sealHeight = seal.offsetHeight || 112;
+            
+            posX = (window.innerWidth / 2) - (sealWidth / 2);
+            posY = (window.innerHeight / 2) - (sealHeight / 2);
+            
+            speedX = Math.random() > 0.5 ? 4 : -4;
+            speedY = Math.random() > 0.5 ? 4 : -4;
+            
+            seal.style.left = posX + 'px';
+            seal.style.top = posY + 'px';
+            seal.style.display = 'block';
+
+            if (!isBouncing) {
+                isBouncing = true;
+                animateDVD();
+            }
+        }
+
+        function animateDVD() {
+            if (!isBouncing) return;
+
+            const sealWidth = seal.offsetWidth;
+            const sealHeight = seal.offsetHeight;
+            const winWidth = window.innerWidth;
+            const winHeight = window.innerHeight;
+
+            posX += speedX;
+            posY += speedY;
+
+            let hitLeft = posX <= 0;
+            let hitRight = posX + sealWidth >= winWidth;
+            let hitTop = posY <= 0;
+            let hitBottom = posY + sealHeight >= winHeight;
+
+            if ((hitLeft && hitTop) || (hitLeft && hitBottom) || (hitRight && hitTop) || (hitRight && hitBottom)) {
+                seal.style.display = 'none';
+                isBouncing = false;
+                cancelAnimationFrame(animationFrameId);
+                return;
+            }
+
+            if (hitLeft || hitRight) {
+                speedX = -speedX;
+                if (posX <= 0) posX = 0;
+                if (posX + sealWidth >= winWidth) posX = winWidth - sealWidth;
+            }
+            if (hitTop || hitBottom) {
+                speedY = -speedY;
+                if (posY <= 0) posY = 0;
+                if (posY + sealHeight >= winHeight) posY = winHeight - sealHeight;
+            }
+
+            seal.style.left = posX + 'px';
+            seal.style.top = posY + 'px';
+
+            animationFrameId = requestAnimationFrame(animateDVD);
+        }
+
+        // --- BUTTON 2: RIZZING + MOUSE FOLLOWER ENGINE ---
+        rizzBtn.addEventListener('pointerdown', (e) => {
+            audioRizz.currentTime = 0;
+            audioRizz.play().catch(err => console.log(err));
+            
+            rizzCat.style.left = e.clientX + 'px';
+            rizzCat.style.top = e.clientY + 'px';
+            rizzCat.style.display = 'block';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (rizzCat.style.display === 'block') {
+                rizzCat.style.left = e.clientX + 'px';
+                rizzCat.style.top = e.clientY + 'px';
+            }
+        });
+
+        const stopRizzTracking = () => { rizzCat.style.display = 'none'; };
+        rizzBtn.addEventListener('pointerup', stopRizzTracking);
+        rizzBtn.addEventListener('pointerleave', stopRizzTracking);
+
+
+        // --- BUTTON 3: AHHHHH! + FADE-OUT BACKGROUND ENGINE ---
+        ahBtn.addEventListener('pointerdown', () => {
+            audioAh.currentTime = 0;
+            audioAh.play().catch(e => console.log(e));
+            
+            // Instantly activate background overlay with opacity transitions
+            chickenBg.classList.add('active');
+        });
+
+        // Event listener automatically running fade out exactly when audio track runs out
+        audioAh.addEventListener('ended', () => {
+            chickenBg.classList.remove('active');
+        });
+
+
+        // Global Layout Safe Guards
+        window.addEventListener('resize', () => {
+            if (isBouncing) {
+                seal.style.display = 'none';
+                isBouncing = false;
+                cancelAnimationFrame(animationFrameId);
+            }
+            stopRizzTracking();
+            chickenBg.classList.remove('active');
+        });
+    </script>
+</body>
+</html>
